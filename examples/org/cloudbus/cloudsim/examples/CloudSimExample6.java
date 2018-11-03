@@ -15,9 +15,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
+import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.DatacenterBroker;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
@@ -42,15 +43,15 @@ import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 public class CloudSimExample6 {
 
 	/** The cloudlet list. */
-	private static List<Cloudlet> cloudletList;
+	public static List<cloudlet3> cloudletList;
 
 	/** The vmlist. */
-	private static List<Vm> vmlist;
+	public static List<vm3> vmlist;
 
-	private static List<Vm> createVM(int userId, int vms) {
+	public static List<vm3> createVM(int userId, int vms) {
 
 		//Creates a container to store VMs. This list is passed to the broker later
-		LinkedList<Vm> list = new LinkedList<Vm>();
+		LinkedList<vm3> list = new LinkedList<vm3>();
 
 		//VM Parameters
 		long size = 10000; //image size (MB)
@@ -61,10 +62,12 @@ public class CloudSimExample6 {
 		String vmm = "Xen"; //VMM name
 
 		//create VMs
-		Vm[] vm = new Vm[vms];
+		vm3[] vm = new vm3[vms];
+		double[][] comcost= {{0.00,0.17,0.21},{0.17,0.00,0.22},{0.21,0.22,0.00}};
 
 		for(int i=0;i<vms;i++){
-			vm[i] = new Vm(i, userId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+			
+			vm[i] = new vm3(i, userId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared(),comcost[i]);
 			//for creating a VM with a space shared scheduling policy for cloudlets:
 			//vm[i] = Vm(i, userId, mips, pesNumber, ram, bw, size, priority, vmm, new CloudletSchedulerSpaceShared());
 
@@ -75,9 +78,9 @@ public class CloudSimExample6 {
 	}
 
 
-	private static List<Cloudlet> createCloudlet(int userId, int cloudlets){
+	public static List<cloudlet3> createCloudlet(int userId, int cloudlets){
 		// Creates a container to store Cloudlets
-		LinkedList<Cloudlet> list = new LinkedList<Cloudlet>();
+		LinkedList<cloudlet3> list = new LinkedList<cloudlet3>();
 
 		//cloudlet parameters
 		long length = 1000;
@@ -86,10 +89,15 @@ public class CloudSimExample6 {
 		int pesNumber = 1;
 		UtilizationModel utilizationModel = new UtilizationModelFull();
 
-		Cloudlet[] cloudlet = new Cloudlet[cloudlets];
+		cloudlet3[] cloudlet = new cloudlet3[cloudlets];
+		double[][] executioncost= {{1.23,1.12,1.15},{1.17,1.17,1.28},{1.13,1.11,1.11},{1.26,1.12,1.14},{1.19,1.14,1.22}};
+		int[][] datasize= {{30,30},{10,10},{10,10},{10,10},{30,30}};
 
 		for(int i=0;i<cloudlets;i++){
-			cloudlet[i] = new Cloudlet(i, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+			Random rojb=new Random();
+			
+			
+			cloudlet[i] = new cloudlet3(i, length+rojb.nextInt(2000), pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel, executioncost[i], datasize[i]);
 			// setting the owner of these Cloudlets
 			cloudlet[i].setUserId(userId);
 			list.add(cloudlet[i]);
@@ -105,6 +113,7 @@ public class CloudSimExample6 {
 	 * Creates main() to run this example
 	 */
 	public static void main(String[] args) {
+		System.out.println("Here");
 		Log.printLine("Starting CloudSimExample6...");
 
 		try {
@@ -129,14 +138,48 @@ public class CloudSimExample6 {
 			int brokerId = broker.getId();
 
 			//Fourth step: Create VMs and Cloudlets and send them to broker
-			vmlist = createVM(brokerId,20); //creating 20 vms
-			cloudletList = createCloudlet(brokerId,40); // creating 40 cloudlets
+			vmlist = createVM(brokerId,3); //creating 3 vms
+			cloudletList = createCloudlet(brokerId,5); // creating 5 cloudlets
+			
 
 			broker.submitVmList(vmlist);
 			broker.submitCloudletList(cloudletList);
+			CloudSim.startSimulation();
+			GeneticAlgorithm ga = new GeneticAlgorithm(100, 0.001, 0.95, 2, cloudletList, vmlist);//GeneticAlgorithm
+
+			// Initialize population
+			Population population = ga.initPopulation(5);
+
+			// Evaluate population
+			ga.evalPopulation(population);
+			int i=1;
+			while (i<= 100) {
+				// Print fittest individual from population
+				
+				Individual fit=population.getFittest(0);
+				for(int j=0;j<5;j++)
+				{
+					broker.bindCloudletToVm(j, fit.chromosome[j]);
+				}
+				List<Cloudlet> newList = broker.getCloudletReceivedList();
+
+				// Apply crossover
+				population = ga.crossoverPopulation(population);
+
+				// Apply mutation
+				population = ga.mutatePopulation(population);
+
+				// Evaluate population
+				ga.evalPopulation(population);
+
+				// Increment the current generation
+				i++;
+				
+			}
+			System.out.println("Best solution: " + population.getFittest(0).toString());
 
 			// Fifth step: Starts the simulation
-			CloudSim.startSimulation();
+			
 
 			// Final step: Print results when simulation is over
 			List<Cloudlet> newList = broker.getCloudletReceivedList();
