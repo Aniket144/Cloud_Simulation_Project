@@ -5,7 +5,7 @@ import org.cloudbus.cloudsim.UtilizationModel;
 public class cloudlet3 extends Cloudlet {
 	
 	double[] executioncost=new double[3];
-	int[] datasize=new int[2];
+	int[] datasize = new int[2];
 
 	public cloudlet3(int cloudletId, long cloudletLength, int pesNumber, long cloudletFileSize, long cloudletOutputSize,
 			UtilizationModel utilizationModelCpu, UtilizationModel utilizationModelRam,

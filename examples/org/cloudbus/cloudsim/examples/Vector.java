@@ -7,7 +7,7 @@ package org.cloudbus.cloudsim.examples;
  */
 class Vector {
 
-    private int a, b, c, d, e;
+    public int a, b, c, d, e;
     
 
     Vector () {

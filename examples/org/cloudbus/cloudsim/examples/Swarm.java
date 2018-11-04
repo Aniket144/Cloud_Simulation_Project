@@ -1,6 +1,7 @@
 package org.cloudbus.cloudsim.examples;
 
 
+import java.util.List;
 import java.util.Random;
 
 
@@ -12,12 +13,15 @@ public class Swarm {
 
     private int numOfParticles, epochs;
     private double inertia, cognitiveComponent, socialComponent;
-    private Vector bestPosition;
+    public Vector bestPosition;
     private double bestEval;
+    private int[][] particles;
     // The function to search.
     public static final double DEFAULT_INERTIA = 0.729844;
     public static final double DEFAULT_COGNITIVE = 1.496180; // Cognitive component.
     public static final double DEFAULT_SOCIAL = 1.496180; // Social component.
+    public static List<cloudlet3> cloudletList;
+	public static List<vm3> vmlist;
 
     /**
      * When Particles are created they are given a random position.
@@ -32,8 +36,15 @@ public class Swarm {
      * @param particles     the number of particles to create
      * @param epochs        the number of generations
      */
-    public Swarm (int particles, int epochs) {
-        this( particles, epochs, DEFAULT_INERTIA, DEFAULT_COGNITIVE, DEFAULT_SOCIAL);
+    public Swarm (int[][] particles, int epochs, int numOfParticles, List<cloudlet3> cloudletList, List<vm3> vmlist) {
+    	this.numOfParticles = numOfParticles;
+    	this.particles=particles;
+    	this.epochs=epochs;
+        this.cloudletList = cloudletList;
+    	this.vmlist = vmlist;
+        bestPosition = new Vector(0, 0, 0, 0, 0);
+        bestEval = Double.POSITIVE_INFINITY;
+        
     }
 
     /**
@@ -44,44 +55,35 @@ public class Swarm {
      * @param cognitive     the cognitive component or introversion of the particle
      * @param social        the social component or extroversion of the particle
      */
-    public Swarm (int particles, int epochs, double inertia, double cognitive, double social) {
-        this.numOfParticles = particles;
-        this.epochs = epochs;
-        this.inertia = inertia;
-        this.cognitiveComponent = cognitive;
-        this.socialComponent = social;
-        
-        
-        bestPosition = new Vector(0, 0, 0, 0, 0);
-        bestEval = Double.POSITIVE_INFINITY;
-        
-    }
+    
 
     /**
      * Execute the algorithm.
      */
     public void run (int[][] individuals) {
         Particle[] particle=new Particle[numOfParticles];
-        for(int i=0;i<individuals.length;i++)
+        for(int i=0;i<numOfParticles;i++)
         {
-        	int a=individuals[i][0];
-        	int b=individuals[i][1];
-        	int c=individuals[i][2];
-        	int d=individuals[i][3];
-        	int e=individuals[i][4];
-        	particle[i]=new Particle (a,b,c,d,e);
+        	int a = particles[i][0];
+        	int b = particles[i][1];
+        	int c = particles[i][2];
+        	int d = particles[i][3];
+        	int e = particles[i][4];
+        	particle[i]=new Particle(a,b,c,d,e);
+        	System.out.println("particl "+i+" =>"+(particle[i].position).toString());
         }
 
         double oldEval = bestEval;
         System.out.println("--------------------------EXECUTING-------------------------");
-        System.out.println("Global Best Evaluation (Epoch " + 0 + "):\t"  + bestEval);
+        
 
         for (int i = 0; i < epochs; i++) {
 
             if (bestEval < oldEval) {
-                System.out.println("Global Best Evaluation (Epoch " + (i + 1) + "):\t" + bestEval);
+                
                 oldEval = bestEval;
             }
+            
 
             for (int j=0;j<numOfParticles;j++) {
             	particle[j].updatePersonalBest();
@@ -94,8 +96,8 @@ public class Swarm {
             }
         }
 
-        System.out.println("---------------------------RESULT---------------------------");
-        System.out.println("x = " + bestPosition.getA());
+        
+        
         
         System.out.println("Final Best Evaluation: " + bestEval);
         System.out.println("---------------------------COMPLETE-------------------------");

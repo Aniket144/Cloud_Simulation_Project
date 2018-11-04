@@ -1,6 +1,7 @@
 package org.cloudbus.cloudsim.examples;
 
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -8,10 +9,10 @@ import java.util.Random;
  */
 class Particle {
 
-    private Vector position;        // Current position.
-    private Vector velocity;
-    private Vector bestPosition;    // Personal best solution.
-    private double bestEval;        // Personal best value.
+    public Vector position;        // Current position.
+    public Vector velocity;
+    public Vector bestPosition;    // Personal best solution.
+    public double bestEval;        // Personal best value.
       // The evaluation function to use.
 
     /**
@@ -27,7 +28,7 @@ class Particle {
         position = new Vector(a,b,c,d,e);
         velocity = new Vector();
         
-        bestPosition = velocity.clone();
+        bestPosition = position.clone();
         bestEval = eval();
     }
 
@@ -37,20 +38,60 @@ class Particle {
      */
     private double eval () {
     	
-			double cost=vmlist[0].executioncost[a] + vmlist[1].executioncost[b] + vmlist[2].executioncost[c]+vmlist[3].executioncost[d]+vmlist[4].executioncost[e];
+    	double cost = 0.0;
+		double computationCost = 0;
+		//computation cost
+		double[] executionCostArray = Swarm.cloudletList.get(0).executioncost;
+		computationCost+=executionCostArray[position.a];
+		executionCostArray = Swarm.cloudletList.get(1).executioncost;
+		computationCost+=executionCostArray[position.b];
+		executionCostArray = Swarm.cloudletList.get(2).executioncost;
+		computationCost+=executionCostArray[position.c];
+		executionCostArray = Swarm.cloudletList.get(3).executioncost;
+		computationCost+=executionCostArray[position.d];
+		executionCostArray = Swarm.cloudletList.get(4).executioncost;
+		computationCost+=executionCostArray[position.e];
+		
+		double communicationCost = 0;
+		int[] data = Swarm.cloudletList.get(1).datasize;
+//		System.out.println(Arrays.toString(data));
+		
+		double[] communicationCostArray = Swarm.vmlist.get(position.a).comcost;
+		communicationCost+=data[0]*communicationCostArray[position.b];
+		data = Swarm.cloudletList.get(2).datasize;
+		
+//		System.out.println(Arrays.toString(data));
+		
+		communicationCostArray = Swarm.vmlist.get(position.b).comcost;
+		communicationCost+=data[0]*communicationCostArray[position.c];
+		data = Swarm.cloudletList.get(3).datasize;
+//		System.out.println(Arrays.toString(data));
+		
+		communicationCostArray = Swarm.vmlist.get(position.c).comcost;
+		communicationCost+=data[0]*communicationCostArray[position.d];
+		data = Swarm.cloudletList.get(4).datasize;
+//		System.out.println(Arrays.toString(data));
+		
+		communicationCostArray = Swarm.vmlist.get(position.d).comcost;
+		communicationCost+=data[0]*communicationCostArray[position.e];
+//		System.out.println(Arrays.toString(data));
+		
+		
+		
 		
 		//communication cost
-			cost=cost+(cloudletList[individual[1]].comcost[individual[0]])*vmlist[1].datasize[0]+(cloudletList[individual[2]].comcost[individual[1]])*vmlist[2].datasize[0]
-					+(cloudletList[individual[3]].comcost[individual[2]])*vmlist[3].datasize[0]+(cloudletList[individual[4]].comcost[individual[3]])*vmlist[4].datasize[0];
-							
-
+		
+		
+		cost = computationCost + communicationCost;
 		// Calculate fitness
-		double fitness = (double) cost;
-
+		
+		// Store fitness
+		
+		
 		// Store fitness
 		
 
-		return fitness;
+		return cost;
     }
 
 

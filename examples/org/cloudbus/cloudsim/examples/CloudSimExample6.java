@@ -36,6 +36,8 @@ import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 
+
+
 /**
  * An example showing how to create
  * scalable simulations.
@@ -90,8 +92,8 @@ public class CloudSimExample6 {
 		UtilizationModel utilizationModel = new UtilizationModelFull();
 
 		cloudlet3[] cloudlet = new cloudlet3[cloudlets];
-		double[][] executioncost= {{1.23,1.12,1.15},{1.17,1.17,1.28},{1.13,1.11,1.11},{1.26,1.12,1.14},{1.19,1.14,1.22}};
-		int[][] datasize= {{30,30},{10,10},{10,10},{10,10},{30,30}};
+		double[][] executioncost= {{10.23,15.12,12.15},{13.17,14.17,11.28},{17.13,13.11,11.11},{12.26,16.12,14.14},{13.19,18.14,10.22}};
+		int[][] datasize= {{15,15},{5,1},{7,1},{3,1},{12,1}};
 
 		for(int i=0;i<cloudlets;i++){
 			Random rojb=new Random();
@@ -113,7 +115,6 @@ public class CloudSimExample6 {
 	 * Creates main() to run this example
 	 */
 	public static void main(String[] args) {
-		System.out.println("Here");
 		Log.printLine("Starting CloudSimExample6...");
 
 		try {
@@ -144,24 +145,36 @@ public class CloudSimExample6 {
 
 			broker.submitVmList(vmlist);
 			broker.submitCloudletList(cloudletList);
-			CloudSim.startSimulation();
-			GeneticAlgorithm ga = new GeneticAlgorithm(100, 0.001, 0.95, 2, cloudletList, vmlist);//GeneticAlgorithm
+			//Sixth step GeneticAlgorithm
+			GeneticAlgorithm ga = new GeneticAlgorithm(15, 0.30, 0.95, 2, cloudletList, vmlist);
 
 			// Initialize population
+			System.out.println("Population GA Init");
 			Population population = ga.initPopulation(5);
 
 			// Evaluate population
 			ga.evalPopulation(population);
+			
+			
 			int i=1;
-			while (i<= 100) {
-				// Print fittest individual from population
+			while (i<= 15) {
+				// get fittest individual from population in every iteration
 				
-				Individual fit=population.getFittest(0);
+				Individual fit = population.getFittest(0);
+//				System.out.println("Individual => ");
+//				for(int j=0;j<5;j++) {
+//					System.out.print(fit.chromosome[j] + " ");
+//				}
+				System.out.print("Fittest: ");
+				for(int j=0;j<5;j++) {
+					System.out.print(fit.chromosome[j] + " ");
+				}
+				System.out.println("  fitness => " + fit.getFitness());
 				for(int j=0;j<5;j++)
 				{
 					broker.bindCloudletToVm(j, fit.chromosome[j]);
 				}
-				List<Cloudlet> newList = broker.getCloudletReceivedList();
+				//List<Cloudlet> newList = broker.getCloudletReceivedList();
 
 				// Apply crossover
 				population = ga.crossoverPopulation(population);
@@ -176,10 +189,32 @@ public class CloudSimExample6 {
 				i++;
 				
 			}
-			System.out.println("Best solution: " + population.getFittest(0).toString());
-
-			// Fifth step: Starts the simulation
+			System.out.println("Best solution of GA: " + population.getFittest(0).toString());
+			//Seventh step particle swarm optimization
+			int[][] particles = new int[population.size()][5];
+			for(int ind=0;ind<population.size();ind++)
+			{
+				for(int index=0;index<5;index++)
+				{
+					particles[ind][index] = population.population[ind].chromosome[index];
+				}
+			}
+			// Swarm creation
+			Swarm swarm = new Swarm(particles, 150, population.size(), cloudletList, vmlist);
+			// Run swarm
+			swarm.run(particles);
+			//print best position
+			System.out.println("Best solution of PSO: " + swarm.bestPosition.toString());
+			//bind cloudlets to vms
+			broker.bindCloudletToVm(0, swarm.bestPosition.getA());
+			broker.bindCloudletToVm(1, swarm.bestPosition.getB());
+			broker.bindCloudletToVm(2, swarm.bestPosition.getC());
+			broker.bindCloudletToVm(3, swarm.bestPosition.getD());
+			broker.bindCloudletToVm(4, swarm.bestPosition.getE());
 			
+
+			// Eightth step: Starts the simulation
+			CloudSim.startSimulation();
 
 			// Final step: Print results when simulation is over
 			List<Cloudlet> newList = broker.getCloudletReceivedList();
@@ -189,6 +224,7 @@ public class CloudSimExample6 {
 			printCloudletList(newList);
 
 			Log.printLine("CloudSimExample6 finished!");
+			
 		}
 		catch (Exception e)
 		{

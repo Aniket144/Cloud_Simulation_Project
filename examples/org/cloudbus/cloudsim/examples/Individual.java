@@ -52,15 +52,19 @@ public class Individual {
 
 		this.chromosome = new int[chromosomeLength];
 		for (int gene = 0; gene < chromosomeLength; gene++) {
-			if (0.7 < Math.random()) {
-				this.setGene(gene, 2);
-			} else if(0.4 < Math.random()){
-				this.setGene(gene, 1);
-			}
-			else
-			{
-				this.setGene(gene, 0);
-			}
+			double r = Math.random();
+//			this.setGene(gene, 1);
+			if(r < 0.3333) this.setGene(gene, 0);
+			else if(r < 0.66) this.setGene(gene, 1);
+			else this.setGene(gene, 2);
+			
+//			if (0.7 < r) {
+//				this.setGene(gene, 2);
+//			} else if(0.4 < r){
+//				this.setGene(gene, 1);
+//			} else {
+//				this.setGene(gene, 0);
+//			}
 		}
 
 	}

@@ -17,8 +17,8 @@ import java.util.Random;
  *
  */
 public class Population {
-	private Individual population[];
-	private double populationFitness = -1;
+	public Individual population[];
+	public double populationFitness = -1;
 
 	/**
 	 * Initializes blank population of individuals
@@ -51,6 +51,14 @@ public class Population {
 			// Add individual to population
 			this.population[individualCount] = individual;
 		}
+		System.out.println("Population");
+		for(int i=0;i<populationSize;i++) {
+			System.out.print("Indi "+i+" -> ");
+			for(int j=0;j<5;j++) {
+				System.out.print(population[i].chromosome[j] + " ");
+			}
+			System.out.println();
+		}
 	}
 
 	/**
@@ -82,9 +90,9 @@ public class Population {
 			@Override
 			public int compare(Individual o1, Individual o2) {
 				if (o1.getFitness() > o2.getFitness()) {
-					return -1;
-				} else if (o1.getFitness() < o2.getFitness()) {
 					return 1;
+				} else if (o1.getFitness() < o2.getFitness()) {
+					return -1;
 				}
 				return 0;
 			}
