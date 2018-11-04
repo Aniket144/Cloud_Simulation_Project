@@ -1,6 +1,5 @@
 package org.cloudbus.cloudsim.examples;
 
-
 import java.util.Arrays;
 import java.util.Random;
 
@@ -24,7 +23,6 @@ class Particle {
     
     Particle (int a,int b,int c,int d,int e) {
         
-        
         position = new Vector(a,b,c,d,e);
         velocity = new Vector();
         
@@ -42,15 +40,15 @@ class Particle {
 		double computationCost = 0;
 		//computation cost
 		double[] executionCostArray = Swarm.cloudletList.get(0).executioncost;
-		computationCost+=executionCostArray[position.a];
+		computationCost += executionCostArray[position.a];
 		executionCostArray = Swarm.cloudletList.get(1).executioncost;
-		computationCost+=executionCostArray[position.b];
+		computationCost += executionCostArray[position.b];
 		executionCostArray = Swarm.cloudletList.get(2).executioncost;
-		computationCost+=executionCostArray[position.c];
+		computationCost += executionCostArray[position.c];
 		executionCostArray = Swarm.cloudletList.get(3).executioncost;
-		computationCost+=executionCostArray[position.d];
+		computationCost += executionCostArray[position.d];
 		executionCostArray = Swarm.cloudletList.get(4).executioncost;
-		computationCost+=executionCostArray[position.e];
+		computationCost += executionCostArray[position.e];
 		
 		double communicationCost = 0;
 		int[] data = Swarm.cloudletList.get(1).datasize;
@@ -76,21 +74,7 @@ class Particle {
 		communicationCost+=data[0]*communicationCostArray[position.e];
 //		System.out.println(Arrays.toString(data));
 		
-		
-		
-		
-		//communication cost
-		
-		
 		cost = computationCost + communicationCost;
-		// Calculate fitness
-		
-		// Store fitness
-		
-		
-		// Store fitness
-		
-
 		return cost;
     }
 

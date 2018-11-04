@@ -1,15 +1,11 @@
 package org.cloudbus.cloudsim.examples;
 
-
-
 /**
  * Can represent a position as well as a velocity.
  */
 class Vector {
 
     public int a, b, c, d, e;
-    
-
     Vector () {
         this(0, 0, 0,0,0);
     }
@@ -105,9 +101,6 @@ class Vector {
         e /= s;
         
     }
-
-    
-    
 
     public Vector clone () {
         return new Vector(a, b, c, d, e);

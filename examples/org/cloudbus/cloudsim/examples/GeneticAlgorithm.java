@@ -64,8 +64,8 @@ public class GeneticAlgorithm {
 		this.mutationRate = mutationRate;
 		this.crossoverRate = crossoverRate;
 		this.elitismCount = elitismCount;
-		this.cloudletList=cloudletList;
-		this.vmlist=vmlist;
+		this.cloudletList = cloudletList;
+		this.vmlist = vmlist;
 	}
 
 	/**
@@ -96,28 +96,24 @@ public class GeneticAlgorithm {
 	 * @return double The fitness value for individual
 	 */
 	public double calcFitness(Individual individual) {
-		//create two VMs
-		//Fifth step: Create two 
-		// properties
-		// Track number of correct genes
+
 		double cost = 0.0;
 		double computationCost = 0;
 		//computation cost
 		for (int geneIndex = 0; geneIndex < individual.getChromosomeLength(); geneIndex++) {
 			// Add one fitness point for each "1" found
 			double[] executionCostArray = cloudletList.get(geneIndex).executioncost;
-//			System.out.println(Arrays.toString(executionCostArray));
 			computationCost += executionCostArray[individual.chromosome[geneIndex]];
 		}
 		double communicationCost = 0;
-		//communication cost
 		/*
 			Task FLow
 						T1
 					  / |  \
 					 T2 T3  T4
 					 \  |  /
-					    T5 
+						T5 
+			Hard-coded task graph. Can also be replaced with edges list.
 		*/
 		ArrayList<Integer> edgesFrom = new ArrayList<Integer>();
 		ArrayList<Integer> edgesTo = new ArrayList<Integer>();
@@ -138,41 +134,12 @@ public class GeneticAlgorithm {
 			double[] communicationCostArray = vmlist.get(processorI).comcost;
 			communicationCost += dataSize * communicationCostArray[processorJ];
 		}
-//		
-//		for(int geneIndex = 1; geneIndex < individual.getChromosomeLength(); geneIndex++)
-//		{
-////			cost = cost + cloudletList.get(individual.chromosome[geneIndex]]).comcost[individual[geneIndex-1]]*vmlist[geneIndex].datasize[0];
-//			int[] data = cloudletList.get(geneIndex).datasize;
-////			System.out.println(Arrays.toString(data));
-//			int vmID = individual.chromosome[geneIndex-1];
-//			double[] communicationCostArray = vmlist.get(vmID).comcost;
-////			System.out.println(Arrays.toString(communicationCostArray));
-////			System.out.println("k=" + individual.chromosome[geneIndex-1]);
-////			System.out.println("i => "+individual.chromosome[geneIndex]);
-////			System.out.println("i-1 => "+individual.chromosome[geneIndex-1]);
-//			communicationCost += data[0]*communicationCostArray[individual.chromosome[geneIndex]];
-//		}
-		// 
-		
-		
-		
-//		System.out.println("cc1 = " + computationCost);
-//		System.out.println("cc2 = " + communicationCost);
 		cost = computationCost + communicationCost;
-		// Calculate fitness
+
 		double fitness =  cost;
-		// Store fitness
 		individual.setFitness(fitness);
+
 		return fitness;
-	}
-	public double calcFitness2(Individual individual) {
-		// Execution Cost
-		double executionCost = 0;
-		for(int geneIndex = 0; geneIndex < individual.getChromosomeLength(); geneIndex++) {
-			double[] executionCostArray = cloudletList.get(geneIndex).executioncost;
-			
-		}
-		return 0;
 	}
 
 	/**
@@ -188,23 +155,18 @@ public class GeneticAlgorithm {
 	 */
 	public void evalPopulation(Population population) {
 		
-
-		// Loop over population evaluating individuals and suming population
-		// fitness
+		// Loop over population evaluating individuals and suming population fitness
 		double populationFitness=0;
-		int i = 0;
+
 		for (Individual individual : population.getIndividuals()) {
-//			populationFitness = calcFitness(individual); 
+
 			double individualFitness = calcFitness(individual); 
 			individual.setFitness(individualFitness);
 			populationFitness+=individualFitness;
-//			System.out.print("Indi " + i + ":  ");
-//			for(int j=0;j<5;j++) System.out.print(individual.chromosome[j] + " ");
-//			System.out.println("fitness => " + individualFitness);
+		
 		}
 		population.setPopulationFitness(populationFitness);
 
-		
 	}
 
 	/**

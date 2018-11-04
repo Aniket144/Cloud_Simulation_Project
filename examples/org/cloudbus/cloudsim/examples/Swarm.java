@@ -1,10 +1,7 @@
 package org.cloudbus.cloudsim.examples;
 
-
 import java.util.List;
 import java.util.Random;
-
-
 
 /**
  * Represents a swarm of particles from the Particle Swarm Optimization algorithm.
@@ -70,7 +67,7 @@ public class Swarm {
         	int d = particles[i][3];
         	int e = particles[i][4];
         	particle[i]=new Particle(a,b,c,d,e);
-        	System.out.println("particl "+i+" =>"+(particle[i].position).toString());
+        	System.out.println("particle " + i + " =>" + (particle[i].position).toString());
         }
 
         double oldEval = bestEval;

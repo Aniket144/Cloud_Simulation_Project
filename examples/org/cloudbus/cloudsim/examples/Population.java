@@ -1,7 +1,5 @@
 package org.cloudbus.cloudsim.examples;
 
-
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
@@ -45,12 +43,14 @@ public class Population {
 
 		// Create each individual in turn
 		for (int individualCount = 0; individualCount < populationSize; individualCount++) {
-			// Create an individual, initializing its chromosome to the given
-			// length
+			// Create an individual, initializing its chromosome to the given length
 			Individual individual = new Individual(chromosomeLength);
 			// Add individual to population
 			this.population[individualCount] = individual;
 		}
+		/*
+		Uncomment to Print Population
+
 		System.out.println("Population");
 		for(int i=0;i<populationSize;i++) {
 			System.out.print("Indi "+i+" -> ");
@@ -59,6 +59,8 @@ public class Population {
 			}
 			System.out.println();
 		}
+
+		*/
 	}
 
 	/**
